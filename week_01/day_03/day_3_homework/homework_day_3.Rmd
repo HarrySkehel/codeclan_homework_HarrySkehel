@@ -1,0 +1,87 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+movies_data <- read_csv("data/movies.csv")
+```
+Question 1
+What could be investigated:
+- Revenue compared to budget
+- How many films made/lost money 
+- How many films kept their origianl titles 
+- If run time affects vote average
+- If a higher vote count = a higher vote average 
+- Turn any 0 in budget or revenue into NAs
+
+```{r}
+#Question 2
+movies_selected <- movies_data %>% 
+  select(title, runtime, budget)
+
+movies_selected
+```
+```{r}
+
+#Question 3
+movies_selected %>% 
+  summarise(count_missint_data = sum(is.na(runtime))) 
+# run for each column or...
+colSums(is.na(movies_selected))
+```
+
+```{r}
+# Question 4
+movies_runtime <- movies_selected %>% 
+  select(title, runtime) %>% 
+  mutate(runtime = na_if(runtime, 0)) %>% 
+  arrange(runtime)
+
+movies_runtime
+
+colSums(is.na(movies_runtime))
+```
+
+```{r}
+# Question 5
+movies_imputed <-  movies_runtime %>%
+  mutate(runtime = coalesce(runtime, 
+                            median(runtime, na.rm = TRUE)))
+                           
+colSums(is.na(movies_imputed))
+```
+
+```{r}
+# Question 6
+movies_imputed %>% 
+  slice_max(runtime, n = 10)
+
+movies_imputed %>% 
+  slice_min(runtime, n = 10)
+
+```
+```{r}
+# Question 7
+movies_imputed <- movies_selected %>%
+  mutate(budget = if_else(budget <= 100, median(budget), budget)) %>% 
+  mutate(runtime = na_if(runtime, 0)) %>% 
+  mutate(runtime = coalesce(runtime, 
+                            median(runtime, na.rm = TRUE)))
+  
+```
+# Extension
+
+```{r}
+movie_budget <- movies_data %>% 
+  select(budget) %>% 
+  mutate(budget_type = case_when(
+    budget <= 12000000 ~ "small budget", 
+    budget <= 40000000 ~ "medium budget",
+    budget >= 40000000 ~ "big budget"
+  ))
+
+movie_budget
+```
+
