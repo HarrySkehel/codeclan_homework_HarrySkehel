@@ -1,0 +1,121 @@
+---
+title: "Dplyr Homework"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+```{r}
+read_csv("data/starbucks_drinkMenu_expanded.csv")
+```
+
+```{r}
+starbucks_drinks <- read_csv("data/starbucks_drinkMenu_expanded.csv")
+starbucks_drinks
+dim(starbucks_drinks)
+names(starbucks_drinks)
+type_sum(starbucks_drinks)
+typeof(starbucks_drinks)
+
+# Question 2 - Got partly correct
+summarise(starbucks_drinks, Beverage_category, Beverage, Beverage_prep, Calories)
+# Homework answer
+starbucks_drinks %>%
+  select(Beverage_category, Beverage, Beverage_prep, Calories) %>%
+  filter(is.na(Calories)) %>%
+  summarise(count_of_missing_calories = n())
+
+# Question 3 - Got correct
+calorie_diff <- mutate(starbucks_drinks, Calorie_diff = Calories - 135, .after = Calories)
+calorie_diff
+
+# Homework answer
+drink_calories <- starbucks_drinks %>%
+  mutate(calorie_diff = Calories - 135)
+drink_calories
+
+
+#Question 4
+bev_categories_grouped <- group_by(starbucks_drinks, Beverage_category)
+summarise(bev_categories_grouped, Calories = mean(Calories))
+arrange(starbucks_drinks, Beverage_category, desc(Calories))
+
+#Homework answer
+most_calories <- drink_calories %>%
+  group_by(Beverage_category) %>%
+  summarise(mean_calories = mean(Calories)) %>%
+  arrange(desc(mean_calories)) %>%
+  head(3)
+most_calories
+
+least_calories <- drink_calories %>%
+  group_by(Beverage_category) %>%
+  summarise(mean_calories = mean(Calories)) %>%
+  arrange(mean_calories)%>%
+  head(3)
+least_calories
+
+#Question 5 Answer
+average_bev_prep <- drink_calories %>%
+  group_by(Beverage_prep) %>%
+  summarise(mean_cals = mean(Calories)) %>%
+  arrange(desc(mean_cals))
+
+#the 3 drinks with the most calories are all Classic Espresso Drniks and 2% and soy milk Caffe Mochas and a Vanilla Latte with 2% milk.
+#the 3 least caloric drinks are all Taz0@ Teas of various sizes
+
+#Question 6
+bev_prep_type <- group_by(starbucks_drinks, Beverage_prep)
+bev_prep_type
+mutate(starbucks_drinks, Calories = mean(Calories))
+filter(starbucks_drinks, Calories > mean(Calories))
+
+starbucks_drinks %>% 
+  filter(Calories > mean(Calories)) %>% 
+  group_by(Beverage_prep) %>% 
+  summarise(count = n()) %>% 
+  arrange(count)
+
+#Answer
+avg_calories <- drink_calories %>%
+                  summarise(mean_calories = mean(Calories)) %>%
+                  pull()
+above_avg_calories <- average_bev_prep %>%
+  filter(mean_cals >= avg_calories)
+
+
+
+
+#Question 7
+
+drink_calories %>%
+  filter(Beverage_category != "Tazo® Tea Drinks") %>%
+  group_by(Beverage_category, Beverage, Beverage_prep) %>%
+  summarise(min_calories = min(Calories)) %>%
+  arrange(min_calories) %>%
+  head(1)
+
+#short brewed coffee best for low calories
+
+
+```
+
+```{r}
+#Pull practice
+# find average Calories and create a new column which states TRUE if it is above the average and FALSE if its not.
+average_calorie_content <- starbucks_drinks %>% 
+  summarise(average_value = mean(Calories))
+starbucks_drinks %>% 
+  mutate(higher_than_avg_calories = Calories > average_calorie_content)
+
+starbucks_drinks %>% 
+  mutate(higher_than_avg_calories = Calories > 198)
+
+class(average_calorie_content)
+
+starbucks_drinks %>% 
+  mutate(higher_than_avg_calories = Calories > average_calorie_content$average_value)
+
+```
+
