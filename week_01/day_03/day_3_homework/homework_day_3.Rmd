@@ -16,6 +16,11 @@ What could be investigated:
 - If a higher vote count = a higher vote average 
 - Turn any 0 in budget or revenue into NAs
 
+Mandy's answers :-
+
+- There are a lot of NAs in homepage and tagline columns
+- How much will be lost if we get rid of all the rows with NAs
+
 ```{r}
 #Question 2
 movies_selected <- movies_data %>% 
@@ -27,15 +32,22 @@ movies_selected
 
 #Question 3
 movies_selected %>% 
-  summarise(count_missint_data = sum(is.na(runtime))) 
-# run for each column or...
+  summarise(na_runtime = sum(is.na(runtime)),
+            na_title = sum(is.na(title)),
+            na_budget = sum(is.na(budget)))
+
+# run for each column or...(more for analysis rather than data wrangling)
 colSums(is.na(movies_selected))
+
+# Mandy's answer
+
+movies_selected %>% 
+  summarise(across(.fns = ~sum(is.na(.x))))
 ```
 
 ```{r}
 # Question 4
 movies_runtime <- movies_selected %>% 
-  select(title, runtime) %>% 
   mutate(runtime = na_if(runtime, 0)) %>% 
   arrange(runtime)
 
@@ -62,6 +74,8 @@ movies_imputed %>%
   slice_min(runtime, n = 10)
 
 ```
+
+
 ```{r}
 # Question 7
 movies_imputed <- movies_selected %>%
@@ -69,6 +83,7 @@ movies_imputed <- movies_selected %>%
   mutate(runtime = na_if(runtime, 0)) %>% 
   mutate(runtime = coalesce(runtime, 
                             median(runtime, na.rm = TRUE)))
+movies_imputed
   
 ```
 # Extension
@@ -77,11 +92,24 @@ movies_imputed <- movies_selected %>%
 movie_budget <- movies_data %>% 
   select(budget) %>% 
   mutate(budget_type = case_when(
-    budget <= 12000000 ~ "small budget", 
-    budget <= 40000000 ~ "medium budget",
-    budget >= 40000000 ~ "big budget"
-  ))
+    budget < 12e6 ~ "small budget", 
+    budget < 40e6 ~ "medium budget",
+    budget >= 40e6 ~ "big budget"
+  )
+)
 
 movie_budget
+```
+```{r}
+# 2nd extension question - Check the homework folder for answer
+movies_data %>% 
+  summarise(across(
+    .cols = where(is.numeric),
+    .fns = ~sum(is.na(.x)
+                )
+    ))
+
+movies_data %>% 
+
 ```
 
