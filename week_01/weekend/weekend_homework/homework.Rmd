@@ -1,0 +1,120 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+books_data <- read_csv("data/books.csv")
+```
+```{r}
+dim(books_data)
+```
+```{r}
+# Number of NAs in dataset and average rating for each publisher and author
+
+colSums(is.na(books_data))
+
+arrange(books_data)
+
+average_publisher_rating <- books_data %>% 
+  group_by(publisher) %>% 
+  summarise(avg_publisher_rating = mean(average_rating)) %>% 
+  arrange()
+
+
+average_author_rating <- books_data %>% 
+  group_by(authors) %>% 
+  summarise(avg_author_rating = mean(average_rating)) %>% 
+  arrange()
+
+
+```
+
+```{r}
+# Books with ratings higher than 4
+
+books_data %>% 
+  select(average_rating, publisher) %>% 
+  mutate(
+    higher_than_4 = average_rating > 4.0
+  )
+  
+
+   
+# Rating as a description rather than a number  
+books_data %>% 
+  select(average_rating, title) %>% 
+  mutate(
+    simplied_rating = case_when(
+      average_rating < 1  ~ "Very Poor",
+      average_rating <= 2 ~ "Poor",
+      average_rating <= 3 ~ "Mediocre",
+      average_rating <= 4 ~ "Good",
+      average_rating <= 5 ~ "Excellent"
+    )
+  )
+```
+```{r}
+books_data %>% 
+  sample_frac(0.01)
+
+books_data %>%
+  sample_frac(0.1) %>% 
+  distinct(publisher, num_pages) %>% 
+  arrange(desc(num_pages))
+```
+```{r}
+# Number of books per publisher
+
+books_data %>%
+  group_by(publisher) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+``` 
+```{r}
+# Number of books in each language
+
+books_data %>% 
+  group_by(language_code) %>% 
+  summarise(count = n()) %>%
+  arrange(desc(count))
+```
+```{r}
+# Plot of number of pages against average rating but no decent insight from it
+
+books_data$num_pages
+books_data$average_rating
+
+data_w_no_NA <- books_data %>% 
+  drop_na()
+
+glimpse(books_data)
+
+plot(data_w_no_NA$ratings_count, data_w_no_NA$average_rating)
+     
+```
+```{r}
+# Publish/author combinations
+
+author_by_pub <- data_w_no_NA %>% 
+  select(authors, publisher) %>%
+  group_by(publisher) %>% 
+  summarise(authors)
+  
+```
+```{r}
+data_w_no_NA %>% 
+  filter_(grepl('Harry', title))
+  
+# All HArry Potter Books
+  
+library(stringr)
+title_list <- c("Harry Potter", "harry")
+all_harrypotter_books <- filter(data_w_no_NA, 
+                                str_detect(title, 
+                                           paste(title_list, 
+                                                 collapse = "|")))
+```
+

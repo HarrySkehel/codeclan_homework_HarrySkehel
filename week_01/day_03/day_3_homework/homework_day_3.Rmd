@@ -60,7 +60,9 @@ colSums(is.na(movies_runtime))
 # Question 5
 movies_imputed <-  movies_runtime %>%
   mutate(runtime = coalesce(runtime, 
-                            median(runtime, na.rm = TRUE)))
+                            median(runtime, na.rm = TRUE)
+                            )
+         )
                            
 colSums(is.na(movies_imputed))
 ```
@@ -82,7 +84,9 @@ movies_imputed <- movies_selected %>%
   mutate(budget = if_else(budget <= 100, median(budget), budget)) %>% 
   mutate(runtime = na_if(runtime, 0)) %>% 
   mutate(runtime = coalesce(runtime, 
-                            median(runtime, na.rm = TRUE)))
+                            median(runtime, na.rm = TRUE)
+                            )
+         )
 movies_imputed
   
 ```
