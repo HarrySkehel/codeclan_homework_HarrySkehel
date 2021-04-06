@@ -10,6 +10,10 @@ books_data <- read_csv("data/books.csv")
 ```
 ```{r}
 dim(books_data)
+
+head(books_data)
+
+tail(books_data)
 ```
 ```{r}
 # Number of NAs in dataset and average rating for each publisher and author
@@ -23,12 +27,16 @@ average_publisher_rating <- books_data %>%
   summarise(avg_publisher_rating = mean(average_rating)) %>% 
   arrange()
 
+average_publisher_rating
+
+
 
 average_author_rating <- books_data %>% 
   group_by(authors) %>% 
   summarise(avg_author_rating = mean(average_rating)) %>% 
   arrange()
 
+average_author_rating
 
 ```
 
@@ -56,6 +64,7 @@ books_data %>%
     )
   )
 ```
+
 ```{r}
 books_data %>% 
   sample_frac(0.01)
@@ -65,6 +74,7 @@ books_data %>%
   distinct(publisher, num_pages) %>% 
   arrange(desc(num_pages))
 ```
+
 ```{r}
 # Number of books per publisher
 
@@ -73,6 +83,7 @@ books_data %>%
   summarise(count = n()) %>% 
   arrange(desc(count))
 ``` 
+
 ```{r}
 # Number of books in each language
 
@@ -81,6 +92,7 @@ books_data %>%
   summarise(count = n()) %>%
   arrange(desc(count))
 ```
+
 ```{r}
 # Plot of number of pages against average rating but no decent insight from it
 
@@ -95,6 +107,7 @@ glimpse(books_data)
 plot(data_w_no_NA$ratings_count, data_w_no_NA$average_rating)
      
 ```
+
 ```{r}
 # Publish/author combinations
 
@@ -105,9 +118,7 @@ author_by_pub <- data_w_no_NA %>%
   
 ```
 ```{r}
-data_w_no_NA %>% 
-  filter_(grepl('Harry', title))
-  
+
 # All HArry Potter Books
   
 library(stringr)
@@ -116,5 +127,7 @@ all_harrypotter_books <- filter(data_w_no_NA,
                                 str_detect(title, 
                                            paste(title_list, 
                                                  collapse = "|")))
+
+all_harrypotter_books
 ```
 

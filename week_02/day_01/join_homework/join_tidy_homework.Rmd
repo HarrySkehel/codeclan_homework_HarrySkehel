@@ -1,0 +1,42 @@
+---
+title: "Join Homework"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(stringr)
+```
+```{r}
+left_join(CardBase, 
+          CustomerBase,
+          by = "Cust_ID")
+```
+```{r}
+inner_join(FraudBase, 
+          TransactionBase,
+          by = "Transaction_ID")
+```
+```{r}
+semi_join(CardBase, 
+          TransactionBase,
+          by = c("Card_Number" = "Credit_Card_ID"))
+```
+```{r}
+hats_cleaned <- hat_observations %>% 
+  separate(observation, 
+           into = c("hat_colour", "hat_type"),
+           sep = ","
+  ) %>% 
+  unite(day, month, year,
+        col = "Date",
+        sep = "/")
+```
+```{r}
+berets <- hats_cleaned %>% 
+  filter(hat_type == "beret")
+
+berets %>% 
+  arrange(desc(observation_count))
+```
+
