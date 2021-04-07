@@ -31,8 +31,19 @@ tweets %>%
   filter(is_quote == FALSE) %>% 
   filter(favorite_count != 0)
 
+# or
+
+tweets %>% 
+  filter(favorite_count >= 1, is_quote == FALSE) %>% 
+  count()
 
 tweets
+
+# Correct Answers - asking for total number of favourites rather than total number of tweets that had been favourited
+
+tweets %>%
+  filter(is_quote == FALSE) %>%
+  summarise(total = sum(favorite_count))
 
 ```
 ```{r}
@@ -54,6 +65,15 @@ new_wide[is.na(new_wide)] <-0
 new_wide %>% 
   mutate(across(`Twitter Web App`: TweetDeck, as.numeric)) %>% 
   summarise(across(`Twitter Web App`: TweetDeck, mean))
+
+# Correct answer
+
+mean_retweets <- tweets %>%
+  filter(is_quote == FALSE) %>%
+  group_by(source) %>%
+  summarise(average_retweet = mean(retweet_count))
+
+mean_retweets
   
 ```  
 
@@ -67,7 +87,14 @@ media_count %>%
     names_from = media_type,
     values_from = favorite_count
   ) 
-  
+
+# Correct answer  
+
+tweets %>%
+  mutate(media_type2 = replace_na(media_type, "text")) %>%
+  group_by(media_type2) %>%
+  summarise(favourite_count_total = sum(favorite_count)) %>%
+  arrange(desc(favourite_count_total))
 ```
 
   
@@ -77,6 +104,13 @@ media_count %>%
 tweets %>% 
   select(display_text_width) %>% 
   mutate(mean_tweet_length = mean(display_text_width))
+
+
+
+# Correct answer
+
+tweets %>%
+  summarise(avg_tweet_length = mean(display_text_width))
   
 ```
 
@@ -93,6 +127,10 @@ tweet_urls <- code_clan_tweets %>%
 tweet_urls %>% 
   left_join(tweets, tweet_urls, by = "tweet_id")
 
+# Correct answer
+
+code_clan_all <- left_join(tweet_urls,code_clan_tweets, by = "tweet_id")
+
 ```
 
 ```{r}
@@ -105,6 +143,16 @@ codeclan_hashtags_lower <- tweets %>%
 
 
 codeclan_hashtags_lower
+
+# Correct answer
+
+codeclan_hashtags <- codeclan_all%>% 
+  select(tweet_id, hashtags) %>%
+  mutate(lowcase_hashtag = str_to_lower(hashtags)) %>%
+  select(-hashtags) %>%
+  drop_na(lowcase_hashtag)
+
+codeclan_hashtags
 ```
 ```{r}
 # Tweets from Edinburgh
