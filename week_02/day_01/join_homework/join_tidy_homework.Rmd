@@ -34,9 +34,11 @@ hats_cleaned <- hat_observations %>%
 ```
 ```{r}
 berets <- hats_cleaned %>% 
-  filter(hat_type == "beret")
+  filter(hat_type == "beret") %>% 
+  group_by(Date) %>% 
+  summarise(total = sum(observation_count)) %>% 
+  slice_max(total)
 
-berets %>% 
-  arrange(desc(observation_count))
+
 ```
 

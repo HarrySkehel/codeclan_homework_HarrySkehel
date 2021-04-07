@@ -1,0 +1,123 @@
+---
+title: "Strings/regex homework"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+tweets <- read_csv("data/code_clan_tweets.csv")
+
+# qustion 1
+
+dim(tweets)
+
+class(tweets)
+
+ncol(tweets)
+
+nrow(tweets)
+
+names(tweets)
+
+colSums(is.na(tweets))
+```
+
+```{r}
+# Question 2
+
+tweets %>% 
+  select(favorite_count, is_quote) %>% 
+  filter(is_quote == FALSE) %>% 
+  filter(favorite_count != 0)
+
+
+tweets
+
+```
+```{r}
+# Question 3
+
+wide_tweets <- tweets %>% 
+  pivot_wider(names_from = source, 
+              values_from = retweet_count) %>% 
+  filter(is_quote == FALSE)
+wide_tweets
+
+new_wide <- wide_tweets %>% 
+  select(`Twitter Web App`, `Tweetbot for Mac`, `Hootsuite Inc.`, 
+         `Twitter Web Client`, `Twitter for iPhone`, TweetDeck) 
+
+new_wide
+new_wide[is.na(new_wide)] <-0
+
+new_wide %>% 
+  mutate(across(`Twitter Web App`: TweetDeck, as.numeric)) %>% 
+  summarise(across(`Twitter Web App`: TweetDeck, mean))
+  
+```  
+
+```{r}
+# Question 4
+
+media_count[is.na(media_count)] <- "text"
+
+media_count %>% 
+  pivot_wider(
+    names_from = media_type,
+    values_from = favorite_count
+  ) 
+  
+```
+
+  
+```{r}
+# Question 5
+
+tweets %>% 
+  select(display_text_width) %>% 
+  mutate(mean_tweet_length = mean(display_text_width))
+  
+```
+
+```{r}
+# Quesitobn 6
+
+read_csv("data/code_clan_info.csv")
+
+code_clan_tweets <- read_csv("data/code_clan_info.csv")
+
+tweet_urls <- code_clan_tweets %>% 
+  select(tweet_id, status_url)
+
+tweet_urls %>% 
+  left_join(tweets, tweet_urls, by = "tweet_id")
+
+```
+
+```{r}
+# Question 7
+
+codeclan_hashtags_lower <- tweets %>% 
+  select(tweet_id, hashtags) %>% 
+  drop_na() %>% 
+  mutate(hashtags = tolower(hashtags))
+
+
+codeclan_hashtags_lower
+```
+```{r}
+# Tweets from Edinburgh
+
+edinburgh_tweets %>% 
+  select(tweet_id, text, retweet_location) %>% 
+  drop_na() %>%
+  mutate("from_edinburgh" = str_detect(retweet_location, "[E][d]")) %>% 
+  filter(from_edinburgh == TRUE)
+
+  
+  
+  
+
+```
+
