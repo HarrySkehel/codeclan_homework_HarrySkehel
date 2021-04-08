@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+Question 1
+```{r}
+weather <- list(
+  "Thursday" = list(temp_high = 10, temp_low = 1, chance_of_rain = "90%", wind_speed_mph = 7),
+  "Friday" = list(temp_high = 8, temp_low = -4, chance_of_rain ="10%", wind_speed_mph = 13),
+  "Saturday" = list(temp_high = 7, temp_low = -4, chance_of_rain = "15%", wind_speed_mph = 6)
+)
+
+
+```
+Question 2
+```{r}
+weather$Thursday$chance_of_rain
+weather$Saturday$wind_speed_mph
+weather$Friday$temp_high
+```
+Question 3
+```{r}
+weather <- matrix(c(9, 8, 7, 8, 10, 10, 10, 11, 11, 11, 11, 12, 11, 10), nrow = 2, ncol = 7, byrow = TRUE)
+
+colnames(weather) <- c("Thursday", "Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday")
+
+rownames(weather) <- c("Week 1 Temps", "Week 2 Temps")
+
+weather
+```
+Question 4
+```{r}
+weather[2, 3]
+weather[2, ]
+weather[2, c(1, 3, 5)]
+```
+Querstion 5
+```{r}
+append_number <- function(x){
+  if(is.numeric(x) == FALSE){
+    return(str_c("The answer is: ", x))
+  }
+  if(is.numeric(x) == TRUE){
+    }
+    if((x < 10) == TRUE){
+      return(x)
+    }
+  if(x > 10){
+    return(x / 10)
+  }
+  else{
+    return("invalid input")
+  }
+  } 
+
+append_number(10)
+
+
+
+is_an_number(3)
+is.numeric(8)
+```
+```{r}
+library(stringr)
+library(generics)
+```
+Extension
+
+```{r}
+mult_tab <- function(n) seq.int(n) %o% seq.int(n)
+
+times_table <- mult_tab(12)
+
+class(times_table)
+```
+
