@@ -50,14 +50,15 @@ append_number <- function(x){
       return(x)
     }
   if(x > 10){
-    return(x / 10)
+    y <- (x/10)
+    return(y)
   }
   else{
     return("invalid input")
   }
   } 
 
-append_number(10)
+append_number(25)
 
 
 
@@ -76,5 +77,26 @@ mult_tab <- function(n) seq.int(n) %o% seq.int(n)
 times_table <- mult_tab(12)
 
 class(times_table)
+```
+```{r}
+append_number_different <- function(x){
+  if(is.numeric(x) == FALSE){
+    return(str_c("invalid input"))
+  }
+  if(is.numeric(x) == TRUE){
+    }
+    if((x < 10) == TRUE){
+      return(str_c("The answer is: ",  x))
+    }
+  if(x > 10){
+    y <- (x/10)
+    return(str_c("The answer is: ",  y))
+  }
+  else{
+    return("invalid input")
+  }
+} 
+
+append_number_different(12)
 ```
 
