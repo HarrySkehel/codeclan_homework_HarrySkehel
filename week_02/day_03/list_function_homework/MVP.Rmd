@@ -58,13 +58,38 @@ append_number <- function(x){
   }
   } 
 
-append_number(25)
+append_number(10)
 
 
 
 is_an_number(3)
 is.numeric(8)
 ```
+Question 6 Answer
+
+```{r}
+
+a <- c(1, 2, 3, 4, 5)
+b <- c(1, 4, 2, 3, 5)
+c <- c(9, 4, 8, 1, 0)
+
+
+
+is_same_vector <- function(vector_1, vector_2) {
+  if (all(vector_1 == vector_2)) {
+    return("Exactly the same")
+  }
+
+  if (all(sort(vector_1) == sort(vector_2))) {
+    return("The same")
+  }
+
+  return("Different")
+}
+
+is_same_vector(a, c)
+```
+
 ```{r}
 library(stringr)
 library(generics)
@@ -73,6 +98,8 @@ Extension
 
 ```{r}
 mult_tab <- function(n) seq.int(n) %o% seq.int(n)
+
+mult_tab(5)
 
 times_table <- mult_tab(12)
 
