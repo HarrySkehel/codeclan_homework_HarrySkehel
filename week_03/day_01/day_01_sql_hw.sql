@@ -74,11 +74,38 @@ WHERE first_name IS NOT NULL AND last_name IS NOT NULL AND department IS NOT NUL
 
 
 
-SELECT *
-FROM employees 
-EXTRACT (YEAR FROM start_date)
+SELECT
+  first_name,
+  last_name,
+  department,
+  start_date,
+  CONCAT(
+    first_name, ' ', last_name, ' - ', department, 
+    ' (joined ', EXTRACT(YEAR FROM start_date), ')'
+  ) AS badge_label
+FROM employees
+WHERE 
+  first_name IS NOT NULL AND 
+  last_name IS NOT NULL AND 
+  department IS NOT NULL AND
+  start_date IS NOT NULL
 
 
+SELECT
+  first_name,
+  last_name,
+  department,
+  start_date,
+  CONCAT(
+    first_name, ' ', last_name, ' - ', department, ' (joined ', 
+    TO_CHAR(start_date, 'Month'),' ', TO_CHAR(start_date,'YYYY'), ')'
+  ) AS badge_label
+FROM employees
+WHERE 
+  first_name IS NOT NULL AND 
+  last_name IS NOT NULL AND 
+  department IS NOT NULL AND
+  start_date IS NOT NULL
 
 
 
