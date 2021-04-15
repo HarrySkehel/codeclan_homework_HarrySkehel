@@ -87,30 +87,34 @@ SELECT
 	t.name AS team_name
 FROM teams AS t
 INNER JOIN employees AS e
-ON e.team_id = t.id 
+ON e.team_id = t.id
 
-/* Question 3(b) & (c) */
 SELECT
 	count(e) AS number_of_employees,
-	t.name AS team_name
+	t.name AS team_name 
 FROM teams AS t
 INNER JOIN employees AS e
 ON e.team_id = t.id 
 GROUP BY t.name
-ORDER BY  COUNT(e) DESC
+ORDER BY  COUNT(e)
+
+
+
+
+
+
 
 
 /* Question 4 (a) */
 SELECT
-	t.id AS team_id,
+	count(e) AS number_of_employees,
 	t.name AS team_name,
-	count(e),
-	(CAST(t.charge_cost AS int) * count(e)) AS total_charge_cost	
+	t.id 
 FROM teams AS t
 INNER JOIN employees AS e
 ON e.team_id = t.id 
 GROUP BY t.name, t.id 
-ORDER BY team_id 
+ORDER BY  COUNT(e) DESC
 
 
 /* Question 4 (b) */
@@ -122,14 +126,26 @@ SELECT
 FROM teams AS t
 INNER JOIN employees AS e
 ON e.team_id = t.id 
-WHERE (t.id * count(e)) > 5000
 GROUP BY t.name, t.id 
 ORDER BY team_id 
 
 
+/* Question 4 (c) */
+SELECT
+	t.id AS team_id,
+	t.name AS team_name,
+	count(e),
+	(CAST(t.charge_cost AS int) * count(e)) AS total_charge_cost	
+FROM teams AS t
+INNER JOIN employees AS e
+ON e.team_id = t.id 
+GROUP BY t.name, t.id 
+HAVING COUNT(e.id) * CAST(t.charge_cost AS INT) > 5000
+
+
 /* Extension */
 
-SELECT 
+SELECT
 	e.first_name,
 	e.last_name,
 	emp_coms.committee_id,
@@ -138,3 +154,23 @@ FROM employees AS e
 LEFT JOIN employees_committees AS emp_coms
 ON emp_coms.employee_id = e.id 
 WHERE emp_coms.committee_id IS NOT NULL
+
+/* Correct answer */
+
+SELECT
+	count(distinct(employee_id)) AS num_employees_on_committees
+FROM employees_committees
+
+SELECT 
+  COUNT(*) AS num_not_in_committees
+FROM employees e
+LEFT JOIN employees_committees ec
+ON e.id = ec.employee_id 
+WHERE ec.employee_id IS NULL
+
+/* OR */
+
+SELECT 
+  (SELECT COUNT(id) FROM employees) -
+  (SELECT COUNT(DISTINCT(employee_id)) FROM employees_committees)
+    AS num_not_in_committees
