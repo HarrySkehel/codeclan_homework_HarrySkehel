@@ -65,7 +65,7 @@ GROUP BY pension_enrol
 SELECT 
 	max(salary)
 FROM employees
-WHERE department = 'Engineering' AND fte_hours = '1'
+WHERE department = 'Engineering' AND fte_hours = 1
 
 /* Question 10 */
 
@@ -135,7 +135,7 @@ WITH grade_1_count AS (
 	FROM employees
 	GROUP BY department 
 )
-SELECT e.department, 
+	SELECT e.department, 
 		count(e.id) AS num_grade_1,
 		100*count(id)/
 		g.num_employees AS percenatage_grade_1
@@ -146,8 +146,55 @@ SELECT e.department,
 		GROUP BY e.department, g.num_employees
 		
 		
+--- Other way of answering 16
 		
-/* Averager salary per country compared to overall average salary */
+
+		
+-- number of employees grade 1 grouped by department 
+-- number of all employees grouped by department 
+-- to get prop divide first number by second 
+		
+		
+		
+		WITH grade_1_count AS (               --- first find all the folk who are grade 1
+		SELECT 
+			department,
+			CAST(COUNT(id) AS REAL) AS count_grade_1  --- CAST() stops all the integers being rounded down
+		FROM employees
+		WHERE grade = 1
+		GROUP BY department 
+		),
+		department_count AS ( 					--- find the count of all the folk in each department 
+		SELECT 
+			department,
+			COUNT(id) AS count_all
+		FROM employees
+		GROUP BY department
+		)
+		SELECT
+			department_count.department,
+			grade_1_count.count_grade_1,
+			department_count.count_all,
+			grade_1_count.count_grade_1/department_count.count_all AS grade_1_prop  --- Without cast, grade_1_prop would have loads of zeros
+		FROM department_count
+		INNER JOIN grade_1_count 
+		ON department_count.department = grade_1_count.department 
+		
+		
+--- very quick way of doing 16
+		
+SELECT 
+  department, 
+  SUM(CAST(grade = '1' AS INT)) / CAST(COUNT(id) AS REAL) AS prop_grade_1 
+FROM employees 
+GROUP BY department
+		
+		
+--- SUM(CAST(grade = '1' AS INT)) turns grade into a boolean so its a 1 is grade1 is true and 0 if not 	
+--- so then that sum total is divided by CAST(COUNT(id) AS REAL), 
+--- which is the total count of employees across all grades	to get the amount of grade 1s as a proportion.	
+		
+		/* Averager salary per country compared to overall average salary */
 
 WITH country_average AS(
 	SELECT 
