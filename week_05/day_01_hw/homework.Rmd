@@ -9,7 +9,7 @@ library(CodeClanData)
 
 backpack %>% 
   filter(sex == "Female")
-
+backpack <- backpack
 
 ```
 
@@ -35,7 +35,7 @@ ggplot(backpack) +
 ggplot(backpack) +
   aes(x = backpack_weight, fill = sex) +
   geom_bar(stat = "count", position = "dodge") +
-  facet_wrap(~ sex) +
+  facet_wrap(~ sex, nrow = 2) +
   scale_x_continuous(breaks = c(5, 10, 15, 20, 25, 30, 35)) +
   scale_y_continuous(breaks = 1:12) +
    labs(y = "backpack weight (kg)",
@@ -92,12 +92,18 @@ ggplot(backpack) +
 ```{r}
 # question 6 What proportion of students report back pain?
 
+backpack <- backpack %>% 
+  mutate(back_problems = recode(back_problems,
+                                "0" = "No",
+                                "1" = "Yes"))
+
+
+
 ggplot(backpack) +
   aes(x = back_problems) +
   geom_bar() +
-  scale_x_continuous(breaks = 0:1) +
   scale_y_continuous(breaks = c(10, 20, 30, 40, 50, 60, 70)) +
-  labs(x = "Complained about back problems (TRUE/FALSE)",
+  labs(x = "Complained about back problems",
        y = "Number of individuals",
       title = "Back pain problems in the population")
       
@@ -107,10 +113,11 @@ ggplot(backpack) +
 ```
 
 ```{r}
+# Question 7
+
 ggplot(backpack) +
   aes(x = back_problems, fill = sex) +
   geom_bar() +
-  scale_x_continuous(breaks = 0:1) +
   scale_y_continuous(breaks = c(10, 20, 30, 40, 50, 60, 70)) +
   facet_wrap(~ sex)
 
@@ -118,6 +125,8 @@ ggplot(backpack) +
 ```
 
 ```{r}
+# Question 8 
+
 ggplot(backpack) +
   aes(x = body_weight, y = backpack_weight, colour = sex) +
   geom_point() +

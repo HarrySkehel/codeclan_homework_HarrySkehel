@@ -1,0 +1,125 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(CodeClanData)
+library(tidyverse)
+col_scheme <- c("#E89FE9", "#50434F", "#B6A7B5", "#F9A472", "#BD7040")
+```
+```{r}
+# Part 4.1 ---------------
+
+revenue_breakdown <- qb_revenue_breakdown
+
+revenue_breakdown
+
+ggplot(revenue_breakdown) +
+  aes(x = Product, y = Revenue, fill = Year) +
+  geom_col() +
+    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    panel.grid.minor = element_line(colour = "grey92"),
+    panel.grid.major = element_line(colour = "grey92"),
+    legend.background = element_rect(colour = "black")) +
+  scale_fill_manual(values = col_scheme) +
+  labs(title = "Comparing Products by Revenue",
+       subtitle = "Distinguished by Year\n")
+  
+
+```
+```{r}
+# Part 4.2 -------------------------
+
+monthly_sales <- qb_monthly_sales
+
+monthly_sales %>% 
+  filter(Cashflow == "Kwikbit Unit 1 Sales") %>% 
+  ggplot() +
+  aes(x = Date, y = Amount) +
+  geom_line() +
+    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    panel.grid.minor = element_line(colour = "grey92"),
+    panel.grid.major = element_line(colour = "grey92"),
+    legend.background = element_rect(colour = "black")) +
+  labs(x = "Date\n",
+       y = "Units sold",
+       title = "Number of Kwikbits Unit 1's sold")
+
+```
+
+```{r}
+# Part 4.3 --------------------
+
+monthly_sales %>% 
+  filter(Cashflow != "Kwikbit Unit 1 Sales") %>% 
+  ggplot() +
+  aes(x = Date, y = Amount, colour = Cashflow) +
+  geom_line() +
+    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    panel.grid.minor = element_line(colour = "grey92"),
+    panel.grid.major = element_line(colour = "grey92"),
+    legend.background = element_rect(colour = "black")) +
+  scale_colour_manual(values = col_scheme) +
+  labs(x = "Time",
+       y = "Amount (currency)",
+       title = "Costs vs Revenue\n")
+  
+
+```
+
+```{r}
+# Part 4.4 --------------------
+
+competitors <- qb_competitors
+
+ggplot(competitors) +
+  aes(x = Year, y = Revenue, fill = Company) +
+  geom_area() +
+    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    panel.grid.minor = element_line(colour = "grey92"),
+    panel.grid.major = element_line(colour = "grey92"),
+    legend.background = element_rect(colour = "black")) +
+  scale_fill_manual(values = col_scheme) +
+  labs(x = "Year\n",
+       y = "Revenue\n",
+       title = "Revenue compared to competitors\n")
+
+# Part 4.5 -----------------
+
+ggplot(competitors) +
+  aes(x = Year, y = Revenue, colour = Company) +
+  geom_line() +
+  geom_point() +
+    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    panel.grid.minor = element_line(colour = "grey92"),
+    panel.grid.major = element_line(colour = "grey92"),
+    legend.background = element_rect(colour = "black")) +
+  scale_colour_manual(values = col_scheme) +
+    labs(x = "Year\n",
+       y = "Revenue\n",
+       title = "Revenue compared to competitors\n")
+
+```
+
+```{r}
+# Part 4.6 ------------------
+
+device_data <- qb_device_data
+
+device_data %>% 
+  distinct(counts)
+  
+  
+
+
+ggplot(device_data) +
+  aes(x = hours, y = counts, group = id, colour = id) +
+  geom_line() +
+    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    panel.grid.minor = element_line(colour = "grey92"),
+    panel.grid.major = element_line(colour = "grey92"),
+    legend.background = element_rect(colour = "black")) +
+  facet_grid(~ device)
+```
+
