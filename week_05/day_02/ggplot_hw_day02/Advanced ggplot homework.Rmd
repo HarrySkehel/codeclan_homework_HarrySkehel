@@ -16,9 +16,9 @@ revenue_breakdown <- qb_revenue_breakdown
 revenue_breakdown
 
 ggplot(revenue_breakdown) +
-  aes(x = Product, y = Revenue, fill = Year) +
+  aes(x = Year, y = Revenue, fill = Product) +
   geom_col() +
-    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    theme(panel.background = element_rect(fill = "white"),
     panel.grid.minor = element_line(colour = "grey92"),
     panel.grid.major = element_line(colour = "grey92"),
     legend.background = element_rect(colour = "black")) +
@@ -38,10 +38,11 @@ monthly_sales %>%
   ggplot() +
   aes(x = Date, y = Amount) +
   geom_line() +
-    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    theme(panel.background = element_rect(fill = "white"),
     panel.grid.minor = element_line(colour = "grey92"),
     panel.grid.major = element_line(colour = "grey92"),
     legend.background = element_rect(colour = "black")) +
+  scale_fill_manual(values = col_scheme) +
   labs(x = "Date\n",
        y = "Units sold",
        title = "Number of Kwikbits Unit 1's sold")
@@ -56,7 +57,7 @@ monthly_sales %>%
   ggplot() +
   aes(x = Date, y = Amount, colour = Cashflow) +
   geom_line() +
-    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    theme(panel.background = element_rect(fill = "white"),
     panel.grid.minor = element_line(colour = "grey92"),
     panel.grid.major = element_line(colour = "grey92"),
     legend.background = element_rect(colour = "black")) +
@@ -76,34 +77,36 @@ competitors <- qb_competitors
 ggplot(competitors) +
   aes(x = Year, y = Revenue, fill = Company) +
   geom_area() +
-    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    theme(panel.background = element_rect(fill = "white"),
     panel.grid.minor = element_line(colour = "grey92"),
     panel.grid.major = element_line(colour = "grey92"),
     legend.background = element_rect(colour = "black")) +
   scale_fill_manual(values = col_scheme) +
   labs(x = "Year\n",
-       y = "Revenue\n",
+       y = "Revenue (£)\n",
        title = "Revenue compared to competitors\n")
 
 # Part 4.5 -----------------
+competitors <- qb_competitors
+col_scheme <- c("#E89FE9", "#50434F", "#B6A7B5", "#F9A472", "#BD7040")
 
 ggplot(competitors) +
   aes(x = Year, y = Revenue, colour = Company) +
   geom_line() +
   geom_point() +
-    theme(panel.background = element_rect(colour = "black", fill = "white"),
+    theme(panel.background = element_rect(fill = "white"),
     panel.grid.minor = element_line(colour = "grey92"),
     panel.grid.major = element_line(colour = "grey92"),
     legend.background = element_rect(colour = "black")) +
   scale_colour_manual(values = col_scheme) +
     labs(x = "Year\n",
-       y = "Revenue\n",
-       title = "Revenue compared to competitors\n")
+       y = "Revenue (£)\n",
+       title = "Revenue Compared to Competitors\n")
 
 ```
 
 ```{r}
-# Part 4.6 ------------------
+# Part 4.6 ------------------ Couldn't get it to work 
 
 device_data <- qb_device_data
 
@@ -121,5 +124,17 @@ ggplot(device_data) +
     panel.grid.major = element_line(colour = "grey92"),
     legend.background = element_rect(colour = "black")) +
   facet_grid(~ device)
+
+# Correct answer
+
+qb_device_data <- 
+mutate(qb_device_data, decimal_hour = hours + (mins/60))
+
+ggplot(qb_device_data) +
+  aes(x = decimal_hour, y = counts) +
+  geom_line() + 
+  facet_grid(id ~ device)
+
+
 ```
 
