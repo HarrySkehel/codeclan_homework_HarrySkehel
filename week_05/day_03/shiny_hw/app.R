@@ -13,6 +13,7 @@ ui <- fluidPage(
     theme = shinytheme("darkly"),
     
     titlePanel("Olympic Medals"),
+    br(),
         tabsetPanel(
             tabPanel("Plot",
                      sidebarLayout(
@@ -31,6 +32,7 @@ ui <- fluidPage(
             ), 
  
             tabPanel("Website",
+                     br(),
                  tags$a(tags$u("The Olymnpics webiste"), href = "https://www.olympic.org")
             ),
             tabPanel("Flag",
