@@ -1,0 +1,104 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(prob)
+library(gtools)
+library(tidyverse)
+```
+Question 1: If I roll a six-sided dice once, what is the probability of getting a number less than 5?
+
+```{r}
+rolldie(1)
+
+4/6
+```
+Question 2: How many outcomes are there in the sample space of an experiment in which we toss three dice?
+
+size_S = 6*6*6
+
+Question 3: In an experiment where we roll four dice:
+
+i. how many outcomes are in the event total_equals_5_6_7 (i.e. the total of the four dice equals 5, 6 or 7)?
+ii. what is the probability of this event?
+iii. what assumptions do we apply in answering part ii?
+
+```{r}
+four_roll <- rolldie(4) %>% 
+  mutate(total = rowSums(.)) 
+
+dim(four_roll)
+
+five_6_7 <- rolldie(4) %>% 
+  mutate(total = rowSums(.)) %>% 
+  filter(total == 5 | total == 6 | total == 7)
+
+dim(five_6_7)
+
+34/1296
+
+```
+Question 4 Five chairs are placed in a row in a room, along with five people of differing height. The people sit down randomly on the chairs. What is the probability that they sit in order of decreasing height, left to right?
+```{r}
+heights <- c(1.20, 1.30, 1.4, 1.5, 1.6)
+
+height_orders <- permutations(
+  n = 5,
+  r = 5,
+  v = heights
+)
+
+1/120
+```
+5. I roll six dice:
+
+i. what is the probability I see the numbers 6, 5, 4, 3, 2 and 1 in order on the dice, left to right?
+ii. what is the probability I see one each of the numbers 6, 5, 4, 3, 2 and 1 on the dice regardless of order?
+```{r}
+six_dice <- rolldie(6)
+
+six_dice %>% 
+  dplyr::filter(isin(., c(6, 5, 4, 3, 2, 1)), ordered = TRUE)
+
+1/46656
+
+720/46656
+```
+Question 6
+
+```{r}
+black_cards <- cards() %>% 
+  mutate(
+    blacks = case_when(
+      suit == "Spade" ~ TRUE,
+      suit == "Club" ~ TRUE,
+      TRUE           ~ FALSE
+      )
+  )
+
+probability of picked a spade is 1/2
+```
+
+Question 7
+```{r}
+patients <- c("Alice", "Bob", "Carmen", "Dinesh", "Ella", "Fergus", "Gianna", "Henry")
+
+patients_ordered <- as_tibble(permutations(
+  n = 8,
+  r = 5,
+  v = patients
+))
+
+as_tibble(patients_ordered)
+
+patients_ordered %>% 
+  dplyr::filter(isin(., c("Gianna", "Dinesh"), ordered = TRUE))
+
+2400/6720
+
+1200/6720
+```
+
+
