@@ -9,7 +9,7 @@ library(shinythemes)
 # games has decreased since games first starting appearing. The also show the variation between the critics ratings
 # and the game players ratings. Splitting it be consol also shows that the newer consoles don't always getting better rated games.
 
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("sandstone"),
     titlePanel("Have games improved over time?"),
 
     mainPanel(
