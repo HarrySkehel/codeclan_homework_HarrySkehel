@@ -1,0 +1,91 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+```
+
+```{r}
+names <- read_csv("data/20190928-items.csv")
+```
+```{r}
+# Question 1
+
+names %>% 
+  group_by(brand) %>% 
+  summarise(count = n())
+  
+samsung <- names %>% 
+  filter(brand == "Samsung")
+```
+
+```{r}
+# Question 2
+
+samsung %>% 
+  ggplot() +
+  aes(x = rating) +
+  geom_histogram(col = "white")
+
+ samsung_stats <- samsung %>% 
+  summarise(
+    num = n(),
+    sd = sd(rating),
+    mean = mean(rating)
+    )
+```
+
+```{r}
+# Question 3
+
+ratings <- samsung %>% 
+  select(rating)
+
+samsung %>% 
+  ggplot() + 
+  aes(x = rating) +
+  geom_histogram(aes(y = ..density..), col = "white") +
+  stat_function(
+    fun = dnorm,
+    args = list(
+      mean = samsung_stats$mean,
+      sd = samsung_stats$sd
+    ),
+    col = "red"
+  )
+```
+
+```{r}
+# Question 4
+
+ratings %>%
+  filter(rating >= samsung_stats$mean - samsung_stats$sd) %>%
+  filter(rating <= samsung_stats$mean + samsung_stats$sd) %>%
+  summarise(prop_within_1sd = n() / nrow(ratings))
+```
+
+```{r}
+ratings <- ratings %>% 
+  mutate(z_rating = scale(rating))
+
+
+ratings %>% 
+  filter(!between(z_rating, left = -3, right = 3))
+```
+
+```{r}
+ratings %>%
+  filter(rating >= samsung_stats$mean - (samsung_stats$sd*2)) %>%
+  filter(rating <= samsung_stats$mean + (samsung_stats$sd*2)) %>%
+  summarise(prop_within_2sd = n() / nrow(ratings))
+```
+```{r}
+ratings %>%
+  filter(rating >= samsung_stats$mean - (samsung_stats$sd*3)) %>%
+  filter(rating <= samsung_stats$mean + (samsung_stats$sd*3)) %>%
+  summarise(prop_within_3sd = n() / nrow(ratings))
+```
+
