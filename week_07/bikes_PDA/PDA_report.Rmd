@@ -1,0 +1,267 @@
+---
+title: Citi Bike Usage 2018
+theme: "cerulean"
+---
+```{r echo=FALSE, fig.align='right'}
+knitr::include_graphics(c("images/citibank_logo.png"))
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE} 
+library(tsibbledata)
+library(lubridate)
+library(tidyverse)
+library(tsibble)
+library(slider)
+library(leaflet)
+library(sf)
+library(feasts)
+library(ggplot2)
+library(egg)
+```
+
+
+### Introduction
+
+Citi Bike is New York City's bike sharing system founded in 2013 and backed by Citi Bank to get more people cycling around the city. There are over 12 000 bikes across New Jersey and the boroughs of New York City and about 100 000 trips are completed everyday.
+
+This particular data set has been taken from journeys made on 10 specific Citi Bikes in New Jersey throughout 2018.
+
+
+#### Method
+
+For this report the data will first be cleaned to remove any extreme or inacurate data within given parameters(discussed in Preparing data for visualization). This data will be used to show bike hire across demographics and across given time periods with the aim of answering the following questions.
+  - What are the patterns of bike hire over time?
+  - Do hire patterns vary with demographic?
+  - What is the Geographical spread of the start points of journeys?
+
+
+#### Data Flow
+
+The below data flow gives a visual representation of the stages in which data is collected starting from the customer account registration and ending with the bikes end station location. For data privacy reasons, customer data such as name, email address and phone number have not been included.
+
+
+```{r echo=FALSE, out.width="150%", fig.cap= "Citi Bike data flow"}
+knitr::include_graphics(c("images/bikes_diagram.png"))
+```
+
+
+### Data for Business
+
+The data reviewed in this report could be of potential business use as it will show demographics where bike usage is low, creating an opportunity for user expansion. 
+
+The data shown may also be useful in displaying geographic areas of use and this could be effective when decisions are made on the location of new bike stations.
+
+
+### Concerns about dataset
+
+- The data is only about 10 bikes in New Jersey so its a small subset.
+- The data does not specify if the bike is electric or not so we cannot compare which is more popular.
+
+
+### Preparing data for visualisation
+
+- create date, week and month columns from the start_date column.
+- create an age column from birth_year column.
+- create a travel time column from start_time and end_time columns.
+- filter out ages that are either > 100 or NULL
+- filter out travel times of over 300 minutes
+
+```{r}
+nyc_bikes <- nyc_bikes
+
+bikes <- nyc_bikes %>% 
+  mutate(year = year(start_time),
+         month = month(start_time, label = TRUE),
+         date = date(start_time),
+         week = week(start_time),
+         journey_length = stop_time - start_time) %>% 
+    mutate(age = year(now()) - birth_year) %>% 
+  relocate(age, .before = gender)
+
+bikes <- bikes %>% 
+  filter(age < 100) %>% 
+  filter(journey_length < 300)
+
+```
+
+
+## Data Visualization
+
+The initial plots I have chosen to give clear representation of some single variable distributions. I have then plotted over potentail varibales of interest in order to visualize any patterns present in the data. The chosen formatting has been used to convey a clear, accurate way while not being misleading.
+
+
+## Bike Hire by Time 
+
+The below plots display the rental of bikes through the year of 2018 both by week and month. 
+
+
+```{r echo=FALSE}
+
+ggplot(bikes) +
+  geom_line(aes(x = month), stat = "count", group = 1, colour = "deepskyblue3") +
+  xlab("Month") +
+  ylab("Number of Journeys") +
+  labs(title = "Bike Joureys in 2018",
+       subtitle = "By Month\n") +
+  theme_classic()
+
+ggplot(bikes) +
+  geom_line(aes(x = week), stat = "count", group = 1, colour = "deepskyblue3") +
+    xlab("Week") +
+  ylab("Number of Journeys") +
+  labs(title = "Bike Joureys in 2018",
+       subtitle = "By Week\n") +
+  theme_classic()
+
+aug_bikes <- bikes %>% 
+  filter(month == "Aug") %>% 
+  ggplot() +
+  geom_line(aes(x = date), group = 1, stat = "count", colour = "deepskyblue3") +
+  xlab("Dates in August") +
+  ylab("Number of journeys made") +
+  labs(title = "Bike Journeys throughout August") +
+  theme_classic()
+
+jan_bikes <- bikes %>% 
+  filter(month == "Jan") %>% 
+  ggplot() +
+  geom_line(aes(x = date), group = 1, stat = "count", colour = "deepskyblue3") +
+  xlab("Dates in January") +
+  ylab("Number of journeys made") +
+  labs(title = "Bike Journeys throughout January") +
+  theme_classic()
+
+
+ggarrange(jan_bikes, aug_bikes, ncol = 2)
+```
+
+
+Although there is more deviation by plotting by week, we can see there is a general rising trend from the winter months to summer months. Variations in use over the weeks could be due to many factors including weather and traffic volume.
+
+
+## Journeys by Age
+
+The below plot displays the age distribution of Citi Bike customers. We can see that a majority of customers are between 25 and 40 years old. 
+
+
+```{r echo=FALSE}
+bikes %>% 
+  ggplot(aes(x = age)) +
+  geom_histogram(colour = "white", bins = 50, fill = "deepskyblue3") +
+  xlab("Customer Age (years)") +
+  ylab("Number of Journeys") +
+  labs(title = "\nBike Journeys by Customer Age\n") +
+  theme_classic()
+  
+```
+
+It is possible that the lack of younger riders could be due to the fact that there is no student discount offered by Citi Bikes and the costs of subscriptions/one off rides on regular basis could be probitevly expensecive for students and young people.
+
+ 
+## Journey By Customer Type
+
+Citi Bikes customers can either be one off customers or can subscribe for a yearly rate. The following plot shows the split of customers between the two hiring options. 
+
+
+```{r echo=FALSE}
+bikes %>% 
+  ggplot(aes(x = type, fill = gender)) +
+  geom_bar() +
+  xlab("Customer Type") +
+  ylab("Number of Journeys") +
+  labs(title = "\nNumber of bike Journeys by Customer Type",
+       subtitle = "Further subsetted by Customer Gender\n",
+    fill = "Customer Gender") +
+  theme_classic()
+```
+
+As we can clearly see there are many more subscribers than one off hirers. There could be many reasons for this and one could be due the costs of one of hiring compared to yearly costs.
+
+The plot also shows the inbalance in gender of customers, a vast majority of the customers (both one off and subscribers) are male.
+
+
+## Other Insights
+
+The below graph displays average travel time by age. 
+
+```{r message=FALSE, echo=FALSE}
+bikes %>% 
+  filter(journey_length < 300) %>% 
+  index_by(age) %>% 
+  summarise(mean_travel_time = mean(journey_length)) %>% 
+  ggplot(aes(x = age, y = mean_travel_time)) +
+  geom_point(colour = "deepskyblue3") +
+  labs(title = "Average Travel by Age") +
+  xlab("Customer Age") +
+  ylab("Average Travel Time") +
+  theme_classic()
+```
+
+As we can see there are a handful of outliers which may be due to one or 2 very high travel times. From the graph it could be suggested that travel time is not necessarily correlated to customer age.
+
+## Most Popular Stations
+
+The below are visualizations of the most popular bike stations. 
+
+```{r echo=FALSE}
+bikes %>% 
+  ggplot(aes(x = start_station)) +
+  geom_bar(stat = "count", fill = "deepskyblue3") +
+  xlab("Journey Start Station") +
+  ylab("Number of Journeys") +
+  coord_flip() +
+  labs(title = "Bike Hires by Start Station\n") +
+  theme_classic()
+
+bikes %>% 
+  ggplot(aes(x = end_station)) +
+  geom_bar(stat = "count", fill = "deepskyblue3") +
+  xlab("Journey Start Station") +
+  ylab("Number of Journeys") +
+  coord_flip() +
+  labs(title = "Bike Hires by End Station\n") +
+  theme_classic()
+```
+
+It can be seen that there are certain bike stations that are heavily used and others which are not as frequently used. This could be down to a variation of reasons including population density, street conditions or bike type.  
+
+By identifying the least used bike stations, Citi Bikes could investigate as to  why those particular stations are infrequently used and if it is worth moving/removing them. 
+
+
+## Map of Start Stations
+
+This map shows the spread of journey start stations. It displays the concentration of starting stations and further supports a previous graph of journey numbers by starting station. We can see from the map that the area of Hobokken is unrepresented.
+
+```{r echo=FALSE}
+leaflet(bikes) %>% 
+  addTiles() %>% 
+  addMarkers(lng = ~start_long,
+             lat = ~start_lat,
+             clusterOptions = markerClusterOptions())
+```
+
+
+## Conclusion
+
+We can see from the above data that even though there are many trips taken every year there are still a few areas where actions taken by Citi Bikes could increase customer numbers.
+
+Factors such as traffic, weather, road conditions and population density are out of the companies control. However, factors such as bike type (electric or standard), station placement and pricing could be areas in which changes could be made to increase the number of people using CitiBikes.
+
+The fact that there are much fewer women cyclist is not specific to Citi Bikes, across the cycling community the ratio of men to women is about 2:1.
+
+
+
+
+```{r echo=FALSE, fig.align='left'}
+knitr::include_graphics(c("images/citibank_logo.png"))
+```
+
+
+
+
+
+
+
+
+
+

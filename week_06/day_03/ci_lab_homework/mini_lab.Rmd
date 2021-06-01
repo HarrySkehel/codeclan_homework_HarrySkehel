@@ -61,6 +61,19 @@ for (sample_num in 1:1000){
     bind_rows(this_result)
   
 }
+
+# Or
+
+bootstrap_ci <- function(data){
+  data %>% 
+  slice_sample(n = 100) %>% 
+  specify(response = sale_price) %>% 
+  generate(reps = 1, type = "bootstrap") %>% 
+  calculate(stat = "mean") %>% 
+  get_confidence_interval(level = 0.95)
+}
+results <- map_dfr(1:1000, ~bootstrap_ci(ames)) %>% mutate(sample_num = row_number())
+
 ```
 
 Question 5

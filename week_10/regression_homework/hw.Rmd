@@ -1,0 +1,50 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(modelr)
+library(janitor)
+library(broom)
+library(ggfortify)
+```
+
+```{r}
+projects <- read_csv("week_10_hw_data/project_management.csv") %>% select(-X1)
+```
+
+```{r}
+projects %>% 
+ggplot(aes(x = actual_length, y = estimated_length)) +
+  geom_point()
+```
+
+```{r}
+projects %>% 
+  summarise(cor(actual_length, estimated_length))
+```
+
+As the r vaule is 0.805, it is very close to 1 and therefore indicates a strong correlation between actual job length and the estimated job time i.e as the the longer jobs were also esitmated to take longer.
+
+```{r}
+model <- lm(estimated_length ~ actual_length, data = projects)
+
+model
+
+tidy(model)
+
+clean_names(glance(model))
+
+projects %>% 
+  ggplot(aes(y = estimated_length, x = actual_length)) +
+  geom_point() +
+  geom_abline(
+    intercept = model$coefficients,
+    slope = model$coefficients
+  )
+
+autoplot(model)
+```
+

@@ -1,0 +1,109 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Question 1.1.3: 3
+
+H0 = µsleep_total(omni) - µsleep_total(herbi) = 0 
+HA = Msleep_total(omni) - µsleep_total(herbi) > 0 
+
+alpha = 0.05
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(infer)
+
+
+sleep <- msleep
+
+omni_herbi <- sleep %>% 
+  filter(vore == "omni" | vore == "herbi")
+
+
+
+omni_herbi %>% 
+  group_by(vore) %>% 
+  summarise(average_sleep = mean(sleep_total))
+
+omni_herbi %>% 
+  ggplot(aes(y = sleep_total, x = vore)) +
+  geom_boxplot()
+  
+```
+Can see from the box plot that that it is unlikely that the difference in average sleep between vores is unlikely to be statiscally significant.
+
+```{r}
+null_distribution <- 
+  omni_herbi %>% 
+  specify(response = sleep_total, explanatory = vore) %>% 
+  hypothesise(null = "independence") %>% 
+  generate(reps = 5000, type = "permute") %>% 
+  calculate(stat = "diff in means", order = c("omni", "herbi"))
+
+null_distribution %>% 
+  visualise(bins = 20)
+
+
+oberserved_stat <- omni_herbi %>% 
+  specify(response = sleep_total, explanatory = vore) %>% 
+  calculate(stat = "diff in means", order = c("omni", "herbi"))
+
+null_distribution %>% 
+  visualise(bins = 20) +
+  shade_p_value(obs_stat = oberserved_stat, direction = "right")
+
+null_distribution %>% 
+  get_p_value(obs_stat = oberserved_stat, direction = "right")
+
+
+```
+P > 0.05, we cannot reject the null hypothesis and therefore do not have the evidence to suggest the average sleep of omni and herbivores is not statistically different
+
+Question 1.1.4 : 4
+```{r}
+domesdicated <- sleep %>%
+  filter(!is.na(conservation)) %>% 
+  mutate(is_domesticated = 
+           case_when(
+             conservation == "domesticated" ~ TRUE,
+             TRUE ~ FALSE
+           ))
+
+oberserved_stat <- domesdicated %>% 
+  specify(response =  )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Question 1.2.5
+
+With a p value of 0.07 we cannot reject the H0 hypothesis and therefore cannot conclude that 40% or more people in the town have heard of the coffee shop.
+
+1.2.6
+
+
+
