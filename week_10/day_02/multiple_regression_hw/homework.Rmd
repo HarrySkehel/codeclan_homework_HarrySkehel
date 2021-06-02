@@ -1,0 +1,85 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(mosaic)
+library(ggfortify)
+library(GGally)
+library(fastDummies)
+```
+
+```{r}
+diamond_data <- diamonds
+
+diamond_tidy <- read_csv("data/diamonds.csv")
+
+diamond_tidy <- diamond_tidy %>% 
+  select(-c("x", "y", "z", "X1"))
+
+diamonds_tidy
+
+ggpairs(diamond_data, progress = FALSE)
+
+```
+
+```{r}
+diamond_data <- diamond_data %>% 
+  select(-c("x", "y", "z"))
+
+ggpairs(diamond_data, progress = FALSE)
+```
+
+```{r}
+diamond_data %>% 
+  ggplot(aes(y = price, x = cut)) +
+  geom_point()
+
+diamond_data %>% 
+  ggplot(aes(y = price, x = carat)) +
+  geom_point()
+```
+5)i)There are 5 factors for cut, 7 for color and 8 for clarity so there should be an additional 20 columns
+
+```{r}
+diamonds_dummy <- diamond_data %>% 
+  dummy_cols(select_columns = c("cut", "color", "clarity"), 
+             remove_first_dummy = TRUE,
+             remove_selected_columns = TRUE)
+
+```
+```{r}
+model = lm(price ~ carat, data = diamonds_dummy)
+
+model2 = lm(price ~ carat + clarity, data = diamond_data)
+
+autoplot(model)
+summary(model)
+```
+From the autoplot, id doesn't look like the model fits very well. However the r number is 0.85 and the p values close to zero to show they are significant.
+
+```{r}
+tidy_model <- lm(price ~ carat + clarity, data = diamond_tidy)
+
+
+summary(tidy_model)
+
+
+
+
+model3 = lm(price ~ cut, data = diamond_data)
+
+autoplot(model2)
+summary(model2)
+
+summary(model3)
+```
+
+```{r}
+diamonds
+
+```
+
