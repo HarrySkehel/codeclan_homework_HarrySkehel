@@ -1,0 +1,84 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(car)
+library(modelr)
+library(GGally)
+```
+
+
+```{r}
+houses <- read_csv("data/kc_house_data.csv") %>% 
+  select(-id, -date, -sqft_living15, -sqft_lot15, -zipcode, -sqft_basement)
+
+houses %>% 
+  mutate(yr_renovated = as.logical(yr_renovated)) 
+```
+
+```{r}
+alias(price ~ ., data = houses)
+
+summary(houses)
+
+```
+
+```{r}
+houses_numeric <- houses %>%
+  select_if(is.numeric)
+
+houses_nonnumeric <- houses %>%
+  select_if(!is.numeric(x))
+
+houses_nonnumeric$price <- houses$price
+
+ggpairs(houses_numeric, progress = FALSE)
+ggpairs(houses_tidy_nonnumeric)
+
+houses_numeric <- houses_numeric %>% 
+  select(-yr_renovated, -waterfront, -yr_built)
+```
+
+```{r}
+houses_model <- lm(price ~ sqft_living, data = houses_numeric)
+
+
+ggpairs(houses, progress = FALSE)
+
+
+summary(houses_model)
+
+houses_model 
+
+plot(houses_model)
+
+
+```
+
+```{r}
+house_trim_resid <- houses_numeric %>% 
+  add_residuals(houses_model) %>% 
+  select(-price, -sqft_living)
+
+ggpairs(house_trim_resid, progress = FALSE)
+```
+
+```{r}
+house_model_2 <- lm(price ~ sqft_living + grade + lat + view, data = houses)
+
+house_trim_residuals <- houses %>% 
+  add_residuals(houses_model) %>% 
+  select(-price, -sqft_living)
+
+ggpairs(house_trim_residuals, progress = FALSE)
+
+summary(house_model_2)
+```
+
+```{r}
+anova(houses_model, house_model_2)
+```
+
