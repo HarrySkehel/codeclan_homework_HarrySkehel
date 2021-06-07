@@ -1,0 +1,81 @@
+---
+title: "Model HW"
+output: html_notebook
+---
+
+Quiz
+
+1. Would be over fitting, we would remove the gender and age predictors as we know we're already looking at scores for 6 year old girls.
+
+2. The model with AIC of 33,559 as we want a lower AIC number.
+
+3. We would use the model with the adjusted r squared of 0.43 as it is a better measure of fit as the over model gets penalizes more heavily for having too many predictors, shown by the the bigger difference been r squared and adjusted r squared in the second model.
+
+4. No, if it were overfitting it would be low on the trained data set and very high on the test. As it is low on both it is well fitting.
+
+5. K - fold vaildation works by splitting the data into non-overlapping groups and testing the model on each of those groups while using all the remaing groups as the training data. It is used to give the best overall reflection of the data set as a whole when training a model
+
+6. It is a data set kept completely seperate from the test/traing data sets to be used to do a final validation of the model to make sure it hasn't been over fitted to the test data.
+
+7. Backwards selection starts with a model that contains all the predictors then removes the least significant variables on after another 
+
+8. Subset selection selects the most descriptive predictor for a certain number of predictors, i.e if the model only has 1 model use predictor x, if it contains 2 use x and y as they are the best predictors.
+
+
+```{r}
+library(tidyverse)
+library(caret)
+library(leaps)
+library(janitor)
+
+avocado <- read_csv("data/avocado.csv") %>%  clean_names()
+
+avocado <- avocado%>% 
+  select(-c("x1", "date", "region", "year"))
+
+avocado_forward <- regsubsets(average_price ~., data = avocado, nvmax = 12, method = "forward")
+
+summary_avo <- summary(avocado_forward)
+```
+
+```{r}
+plot(avocado_forward, scale = "bic")
+
+plot(summary_avo$rsq, type = "b")
+```
+We want the predictors that give the lowest bic number
+
+
+```{r}
+plot(avocado_forward)
+```
+
+```{r}
+avocado_model <- lm(average_price ~ x4046 + x4225 + x4770 + type + large_bags + x_large_bags, data = avocado)
+
+avocado_model_no_bags <-lm(average_price ~ x4046 + x4225 + x4770 + type, data = avocado)
+
+anova(avocado_model_no_bags, avocado_model)
+
+plot(avocado_model)
+
+summary(avocado_model)
+summary(avocado_model_no_bags)
+```
+
+The avova results show that its significantly better having the differnet bag predictors in the model.
+
+
+```{r}
+summary(avocado_model)
+
+par(mfrow = c(2,2))
+plot(avocado_model)
+
+summary(avocado_model_no_bags)
+```
+The model only has an adjusted R of 39.77 which isn't so good.
+
+The plots are a mixed bag, the Scale_Location plot is not what we're looking for, same goes for the Residuals vs Leverage plot.
+
+The plots for Residulas vs Fitted and the Normal Q-Q plots are not too bad.
