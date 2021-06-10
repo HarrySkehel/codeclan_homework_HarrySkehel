@@ -1,0 +1,121 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+library(broom)
+```
+
+
+
+```{r}
+mail_data <- read_csv("data/mall_customers.csv")
+
+mail_data %>% 
+  group_by(Gender) %>% 
+  summarise(mean(`Spending Score (1-100)`))
+
+mail_data %>% 
+  group_by(Gender) %>% 
+  summarise(mean(Age))
+
+mail_data %>% 
+  group_by(Gender) %>% 
+  summarise(mean(`Annual Income (k$)`))
+
+mail_data %>% 
+  count(Gender)
+```
+Mean values for men and women are very close for all variables, women score slightly higher for mean spending score.
+
+There are, 1.2 times more women than there are men in the dataset.
+
+
+```{r}
+mail_data_clean <- mail_data %>% 
+  clean_names()
+
+mail_data_for_cluster <- mail_data_clean %>% 
+  select(annual_income_k, spending_score_1_100)
+  
+```
+
+Scaling data
+
+```{r}
+mail_scale <- mail_data_for_cluster %>% 
+  mutate(across(everything(), scale))
+```
+
+Clustering Metrics
+
+```{r}
+clustered_mail <- kmeans(
+  mail_scale, 
+  centers = 4,
+  nstart = 25
+)
+
+clustered_mail
+```
+
+```{r}
+tidy(clustered_mail,
+     col.names = colnames(mail_scale))
+```
+
+```{r}
+augment(clustered_mail, mail_data_for_cluster)
+```
+
+```{r}
+glance(clustered_mail)
+```
+
+```{r}
+max_k <- 20 
+
+k_clusters <- tibble(k = 1:max_k) %>%
+  mutate(
+    kclust = map(k, ~ kmeans(mail_scale, .x, nstart = 25)), 
+    tidied = map(kclust, tidy),
+    glanced = map(kclust, glance),
+    augmented = map(kclust, augment, mail_data_for_cluster)
+  )
+
+k_clusters
+```
+
+```{r}
+clusterings <- k_clusters %>%
+  unnest(glanced)
+
+clusterings
+```
+
+
+
+```{r}
+fviz_nbclust(
+  mail_scale,
+  kmeans,
+  method = "silhouette",
+  nstart = 25
+)
+```
+
+```{r}
+ clusterings %>% 
+  unnest(cols = c(augmented)) %>%
+  filter(k == 5) %>%
+ ggplot(aes(x = annual_income_k, y = spending_score_1_100, colour = .cluster)) +
+  geom_point(aes(color = .cluster))
+```
+
+This data does lend itself to clusters quite nicely and we can see 5 fairly seperate groupings when we plot spending score and annual income
